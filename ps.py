@@ -32,7 +32,6 @@ with conn.cursor() as cursor:
 	
 	# Recorrer e imprimir
 for ip in data:
-#   for ip in data: 
 # Query a network device using the getCmd() function, providing the auth object, a UDP transport
 # our OID for SYSNAME, and don't lookup the OID in PySNMP's MIB's
       errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
@@ -43,4 +42,10 @@ for ip in data:
        )
 
       for oid, val in varBinds:
-        print(ip[1], val.prettyPrint())
+        #print(ip[1], val.prettyPrint())
+        id_printer = ip[0]
+        consulta = "UPDATE equipos SET ultima_lectura = %s WHERE id_printer = '%s',"
+        #cursor.execute(consulta, (val.prettyPrint(), id_printer))
+        print(ip[1])
+        print(val.prettyPrint())
+        conn.commit()
