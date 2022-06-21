@@ -24,44 +24,23 @@ auth = cmdgen.CommunityData(snmp_ro_comm)
 # Define the CommandGenerator, which will be used to send SNMP queries
 cmdGen = cmdgen.CommandGenerator()
 
+with conn.cursor() as cursor:
+	# En este caso no necesitamos limpiar ningún dato
+	cursor.execute("SELECT ip, id_printer FROM equipos;")
+	# Con fetchall traemos todas las filas
+	data = cursor.fetchall()
+	
+	# Recorrer e imprimir
+for ip in data:
+#   for ip in data: 
 # Query a network device using the getCmd() function, providing the auth object, a UDP transport
 # our OID for SYSNAME, and don't lookup the OID in PySNMP's MIB's
-errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-    auth,
-    cmdgen.UdpTransportTarget((host, 161)),
-    cmdgen.MibVariable(SYSNAME),
-    lookupMib=False,
-)
+      errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+        auth,
+        cmdgen.UdpTransportTarget((ip[0], 161)),
+        cmdgen.MibVariable(SYSNAME),
+        lookupMib=False,
+       )
 
-# Check if there was an error querying the device
-if errorIndication:
-    sys.exit()
-
-# We only expect a single response from the host for sysName, but varBinds is an object
-# that we need to iterate over. It provides the OID and the value, both of which have a
-# prettyPrint() method so that you can get the actual string data
-for oid, val in varBinds:
-    print(val.prettyPrint())
-#    print(oid.prettyPrint(), val.prettyPrint())
-
-
-
-with conn.cursor() as cursor:
-	consulta = "INSERT INTO historial(contador, fecha) VALUES (%s, %s);"
-	#Podemos llamar muchas veces a .execute con datos distintos
-	cursor.execute(consulta, (val.prettyPrint(), dt))
-	conn.commit()
-
-
-try:
-	with conn.cursor() as cursor:
-		# En este caso no necesitamos limpiar ningún dato
-		cursor.execute("SELECT id, modelo, ip, ubicacion, ultima_lectura FROM equipos;")
-		# Con fetchall traemos todas las filas
-		equipos = cursor.fetchall()
-
-		# Recorrer e imprimir
-		for equipo in equipos:
-			print(equipo)
-finally:
-	conn.close()
+      for oid, val in varBinds:
+        print(ip[1], val.prettyPrint())
