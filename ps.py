@@ -1,23 +1,41 @@
-from pysnmp import hlapi
-from . import quicksnmp
+from global_setup import *
+import sys
+from pysnmp.entity.rfc3413.oneliner import cmdgen
 
-# Using SNMPv2c, we set the hostname of the remote device to 'SNMPHost'
-quicksnmp.set('192.168.3.25', {'1.3.6.1.2.1.1.5.0': 'SNMPHost'}, hlapi.CommunityData('ICTSHORE'))
+def __init__ (self):
+    self.conn = pymysql.connect(MY_DB_SERVER, MY_DB_USER, MY_DB_PASS, MY_DB_DB, use_unicode=True, charset="utf8")
 
-# Using SNMPv2c, we retrieve the hostname of the remote device
-print(get('192.168.3.25', ['1.3.6.1.2.1.1.5.0'], hlapi.CommunityData('ICTSHORE')))
+SYSNAME = '1.3.6.1.2.1.43.10.2.1.4.1.1'
 
-# We get interface name and Cisco interface description for all interfaces
-# The last parameter is the OID containing the number of interfaces, so we can loop 'em all!
-its = get_bulk_auto('192.168.3.25', [
-    '1.3.6.1.2.1.2.2.1.2 ',
-    '1.3.6.1.2.1.31.1.1.1.18'
-    ], hlapi.CommunityData('ICTSHORE'), '1.3.6.1.2.1.2.1.0')
+host = '192.168.3.26'
+snmp_ro_comm = 'public'
 
-# We print the results in format OID=value
-for it in its:
-    for k, v in it.items():
-        print("{0}={1}".format(k, v))
- 
-     # We leave a blank line between the output of each interface
-    print('')
+# Define a PySNMP CommunityData object named auth, by providing the SNMP community string
+auth = cmdgen.CommunityData(snmp_ro_comm)
+
+# Define the CommandGenerator, which will be used to send SNMP queries
+cmdGen = cmdgen.CommandGenerator()
+
+# Query a network device using the getCmd() function, providing the auth object, a UDP transport
+# our OID for SYSNAME, and don't lookup the OID in PySNMP's MIB's
+errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+    auth,
+    cmdgen.UdpTransportTarget((host, 161)),
+    cmdgen.MibVariable(SYSNAME),
+    lookupMib=False,
+)
+
+# Check if there was an error querying the device
+if errorIndication:
+    sys.exit()
+
+# We only expect a single response from the host for sysName, but varBinds is an object
+# that we need to iterate over. It provides the OID and the value, both of which have a
+# prettyPrint() method so that you can get the actual string data
+for oid, val in varBinds:
+    print(oid.prettyPrint(), val.prettyPrint())
+
+
+# Prueba modulo de configuracíon
+
+print(MY_DB_DB)
