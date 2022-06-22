@@ -5,7 +5,8 @@ from datetime import datetime
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 #def __init__ (self):
-conn = pymysql.connect(host=MY_DB_SERVER, user=MY_DB_USER, password=MY_DB_PASS, db=MY_DB_DB, use_unicode=True, charset="utf8")
+#conn = pymysql.connect(host=MY_DB_SERVER, user=MY_DB_USER, password=MY_DB_PASS, db=MY_DB_DB, use_unicode=True, charset="utf8")
+conn = pymysql.connect(host=MY_DB_SERVER, user=MY_DB_USER, password=MY_DB_PASS, db=MY_DB_DB, charset="utf8")
 
 SYSNAME = '1.3.6.1.2.1.43.10.2.1.4.1.1'
 
@@ -29,23 +30,24 @@ with conn.cursor() as cursor:
 	cursor.execute("SELECT ip, id_printer FROM equipos;")
 	# Con fetchall traemos todas las filas
 	data = cursor.fetchall()
-	
+
 	# Recorrer e imprimir
-for ip in data:
+for row in data:
 # Query a network device using the getCmd() function, providing the auth object, a UDP transport
 # our OID for SYSNAME, and don't lookup the OID in PySNMP's MIB's
       errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         auth,
-        cmdgen.UdpTransportTarget((ip[0], 161)),
+        cmdgen.UdpTransportTarget((row[0], 161)),
         cmdgen.MibVariable(SYSNAME),
         lookupMib=False,
        )
 
       for oid, val in varBinds:
-        #print(ip[1], val.prettyPrint())
-        id_printer = ip[0]
-        consulta = "UPDATE equipos SET ultima_lectura = %s WHERE id_printer = '%s',"
-        #cursor.execute(consulta, (val.prettyPrint(), id_printer))
-        print(ip[1])
-        print(val.prettyPrint())
-        conn.commit()
+        #print(row[1], val.prettyPrint())
+        with conn.cursor() as cursor2:
+            id_printer = row[1]
+            consulta = "UPDATE equipos SET ultima_lectura = %s WHERE id_printer = %s"
+            cursor2.execute(consulta, (val.prettyPrint(), id_printer))
+            print(consulta, (val.prettyPrint(), id_printer))
+            print(row[1], val.prettyPrint())
+            conn.commit()
