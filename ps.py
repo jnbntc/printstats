@@ -5,12 +5,11 @@ from datetime import datetime
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 #def __init__ (self):
-#conn = pymysql.connect(host=MY_DB_SERVER, user=MY_DB_USER, password=MY_DB_PASS, db=MY_DB_DB, use_unicode=True, charset="utf8")
-conn = pymysql.connect(host=MY_DB_SERVER, user=MY_DB_USER, password=MY_DB_PASS, db=MY_DB_DB, charset="utf8")
+conn = pymysql.connect(host=MY_DB_SERVER, user=MY_DB_USER, password=MY_DB_PASS, db=MY_DB_DB, use_unicode=True, charset="utf8")
+#conn = pymysql.connect(host=MY_DB_SERVER, user=MY_DB_USER, password=MY_DB_PASS, db=MY_DB_DB, charset="utf8")
 
 SYSNAME = '1.3.6.1.2.1.43.10.2.1.4.1.1'
 
-host = '192.168.3.28'
 snmp_ro_comm = 'public'
 
 # Getting the current date and time
@@ -56,7 +55,7 @@ for row in data:
       for oid, val in varBinds:
         with conn.cursor() as cursor3:
             id_printer = row[0]
-            acumulado = row[5] - row[4]
+            acumulado = int(val.prettyPrint()) - row[5]
             if acumulado > 0:
                consulta3 = "INSERT INTO historial (id_printer, acumulado, fecha) VALUES (%s, %s, %s)"
                cursor3.execute(consulta3, (id_printer, acumulado, dt))
@@ -76,4 +75,3 @@ for row in data:
             print(consulta, (val.prettyPrint(), id_printer))
             #print(row[1], val.prettyPrint())
             conn.commit()
-
