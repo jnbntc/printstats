@@ -49,7 +49,8 @@ DROP TABLE IF EXISTS `historial`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `historial` (
-  `contador` int(11) NOT NULL,
+  `id_printer` varchar(15) NOT NULL,
+  `acumulado` int(11) NOT NULL,
   `fecha` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -63,4 +64,4 @@ CREATE TABLE `historial` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-06-22 16:33:47
+-- Dump completed on 2022-06-22 17:55:24

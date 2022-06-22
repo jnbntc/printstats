@@ -26,7 +26,7 @@ auth = cmdgen.CommunityData(snmp_ro_comm)
 cmdGen = cmdgen.CommandGenerator()
 
 with conn.cursor() as cursor:
-	# En este caso no necesitamos limpiar ningún dato
+	# En este caso no necesitamos limpiar ningun dato
 	cursor.execute("SELECT * FROM equipos;")
 	# Con fetchall traemos todas las filas
 	data = cursor.fetchall()
@@ -54,11 +54,26 @@ for row in data:
             conn.commit()
 
       for oid, val in varBinds:
-        #print(row[1], val.prettyPrint())
         with conn.cursor() as cursor3:
             id_printer = row[0]
+            acumulado = row[5] - row[4]
+            if acumulado > 0:
+               consulta3 = "INSERT INTO historial (id_printer, acumulado, fecha) VALUES (%s, %s, %s)"
+               cursor3.execute(consulta3, (id_printer, acumulado, dt))
+               print(consulta3, (id_printer, acumulado, dt))
+            #print(row[1], val.prettyPrint())
+               conn.commit()
+
+      
+      print(acumulado)
+
+      for oid, val in varBinds:
+        #print(row[1], val.prettyPrint())
+        with conn.cursor() as cursor4:
+            id_printer = row[0]
             consulta = "UPDATE equipos SET lectura_actual = %s WHERE id_printer = %s"
-            cursor3.execute(consulta, (val.prettyPrint(), id_printer))
+            cursor4.execute(consulta, (val.prettyPrint(), id_printer))
             print(consulta, (val.prettyPrint(), id_printer))
             #print(row[1], val.prettyPrint())
             conn.commit()
+
