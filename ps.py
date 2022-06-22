@@ -27,7 +27,7 @@ cmdGen = cmdgen.CommandGenerator()
 
 with conn.cursor() as cursor:
 	# En este caso no necesitamos limpiar ningún dato
-	cursor.execute("SELECT ip, id_printer FROM equipos;")
+	cursor.execute("SELECT * FROM equipos;")
 	# Con fetchall traemos todas las filas
 	data = cursor.fetchall()
 
@@ -37,17 +37,28 @@ for row in data:
 # our OID for SYSNAME, and don't lookup the OID in PySNMP's MIB's
       errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         auth,
-        cmdgen.UdpTransportTarget((row[0], 161)),
+        cmdgen.UdpTransportTarget((row[2], 161)),
         cmdgen.MibVariable(SYSNAME),
         lookupMib=False,
        )
 
       for oid, val in varBinds:
-        #print(row[1], val.prettyPrint())
+      #for row in data:
         with conn.cursor() as cursor2:
-            id_printer = row[1]
-            consulta = "UPDATE equipos SET ultima_lectura = %s WHERE id_printer = %s"
-            cursor2.execute(consulta, (val.prettyPrint(), id_printer))
+            id_printer = row[0]
+            anterior = row[5]
+            consulta = "UPDATE equipos SET lectura_anterior = %s WHERE id_printer = %s"
+            cursor2.execute(consulta, (anterior, id_printer))
+            print(consulta, (anterior, id_printer))
+            #print(row[1], val.prettyPrint())
+            conn.commit()
+
+      for oid, val in varBinds:
+        #print(row[1], val.prettyPrint())
+        with conn.cursor() as cursor3:
+            id_printer = row[0]
+            consulta = "UPDATE equipos SET lectura_actual = %s WHERE id_printer = %s"
+            cursor3.execute(consulta, (val.prettyPrint(), id_printer))
             print(consulta, (val.prettyPrint(), id_printer))
-            print(row[1], val.prettyPrint())
+            #print(row[1], val.prettyPrint())
             conn.commit()
