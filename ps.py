@@ -48,7 +48,7 @@ for row in data:
             anterior = row[5]
             consulta = "UPDATE equipos SET lectura_anterior = %s WHERE id_printer = %s"
             cursor2.execute(consulta, (anterior, id_printer))
-            print(consulta, (anterior, id_printer))
+            #print(consulta, (anterior, id_printer))
             #print(row[1], val.prettyPrint())
             conn.commit()
 
@@ -59,12 +59,12 @@ for row in data:
             if acumulado > 0:
                consulta3 = "INSERT INTO historial (id_printer, acumulado, fecha) VALUES (%s, %s, %s)"
                cursor3.execute(consulta3, (id_printer, acumulado, dt))
-               print(consulta3, (id_printer, acumulado, dt))
+               #print(consulta3, (id_printer, acumulado, dt))
             #print(row[1], val.prettyPrint())
                conn.commit()
 
       
-      print(acumulado)
+      #print(acumulado)
 
       for oid, val in varBinds:
         #print(row[1], val.prettyPrint())
@@ -72,6 +72,6 @@ for row in data:
             id_printer = row[0]
             consulta = "UPDATE equipos SET lectura_actual = %s WHERE id_printer = %s"
             cursor4.execute(consulta, (val.prettyPrint(), id_printer))
-            print(consulta, (val.prettyPrint(), id_printer))
+            #print(consulta, (val.prettyPrint(), id_printer))
             #print(row[1], val.prettyPrint())
             conn.commit()
