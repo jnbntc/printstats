@@ -60,7 +60,7 @@ for row in data:
                consulta3 = "INSERT INTO historial (id_printer, acumulado, fecha) VALUES (%s, %s, %s)"
                cursor3.execute(consulta3, (id_printer, acumulado, dt))
                #print(consulta3, (id_printer, acumulado, dt))
-            #print(row[1], val.prettyPrint())
+               #print(row[1], val.prettyPrint())
                conn.commit()
 
       
